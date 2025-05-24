@@ -1,0 +1,180 @@
+//@version=5
+indicator("SYTA Trades Plotter", shorttitle="SYTA Trades", overlay=true)
+
+// Input options
+show_buy_trades = input.bool(true, "Show Buy Trades")
+show_sell_trades = input.bool(true, "Show Sell Trades")
+show_short_trades = input.bool(true, "Show Short Sell Trades")
+show_labels = input.bool(true, "Show Trade Labels")
+
+// Colors for different trade types
+buy_color = color.new(color.green, 0)
+sell_color = color.new(color.red, 0)
+short_color = color.new(color.orange, 0)
+
+// Function to check if current bar matches trade time (exact)
+// Check hour, minute, and second for precise matching, AND symbol is SYTA
+is_trade_time(hour_val, minute_val, second_val) =>
+    syminfo.ticker == "SYTA" and hour(time) == hour_val and minute(time) == minute_val and second(time) == second_val
+
+// Check if we're on the correct symbol
+is_syta_symbol = syminfo.ticker == "SYTA"
+
+// SYTA Trade Data with exact time matching (hour, minute, second)
+// Buy trades
+buy_trade_1 = is_trade_time(7, 20, 6) ? 6.04 : na    // 07:20:06,SYTA,B,6.04,100
+buy_trade_2 = is_trade_time(7, 21, 39) ? 5.96 : na    // 07:21:39,SYTA,B,5.96,30
+buy_trade_3 = is_trade_time(7, 21, 40) ? 5.96 : na    // 07:21:40,SYTA,B,5.96,170
+buy_trade_4 = is_trade_time(7, 27, 46) ? 6.85 : na    // 07:27:46,SYTA,B,6.85,500
+buy_trade_5 = is_trade_time(7, 27, 51) ? 6.83 : na    // 07:27:51,SYTA,B,6.83,500
+buy_trade_6 = is_trade_time(7, 34, 0) ? 6.66 : na    // 07:34:00,SYTA,B,6.66,63
+buy_trade_7 = is_trade_time(7, 34, 1) ? 6.66 : na    // 07:34:01,SYTA,B,6.66,237
+buy_trade_8 = is_trade_time(7, 34, 11) ? 6.58 : na    // 07:34:11,SYTA,B,6.58,300
+buy_trade_9 = is_trade_time(7, 39, 20) ? 6.74 : na    // 07:39:20,SYTA,B,6.74,100
+buy_trade_10 = is_trade_time(7, 39, 34) ? 6.87 : na    // 07:39:34,SYTA,B,6.87,300
+buy_trade_11 = is_trade_time(7, 55, 23) ? 6.87 : na    // 07:55:23,SYTA,B,6.87,200
+buy_trade_12 = is_trade_time(7, 56, 14) ? 6.82 : na    // 07:56:14,SYTA,B,6.82,100
+
+// Sell trades
+sell_trade_1 = is_trade_time(7, 27, 57) ? 6.99 : na     // 07:27:57,SYTA,S,6.99,745
+sell_trade_2 = is_trade_time(7, 28, 2) ? 6.99 : na     // 07:28:02,SYTA,S,6.99,255
+sell_trade_3 = is_trade_time(7, 39, 58) ? 6.99 : na     // 07:39:58,SYTA,S,6.99,300
+sell_trade_4 = is_trade_time(7, 40, 36) ? 7.23 : na     // 07:40:36,SYTA,S,7.23,200
+sell_trade_5 = is_trade_time(7, 43, 22) ? 7.26 : na     // 07:43:22,SYTA,S,7.26,300
+sell_trade_6 = is_trade_time(7, 44, 3) ? 6.85 : na     // 07:44:03,SYTA,S,6.85,200
+sell_trade_7 = is_trade_time(7, 57, 2) ? 6.81 : na     // 07:57:02,SYTA,S,6.81,1
+sell_trade_8 = is_trade_time(7, 57, 2) ? 6.84 : na     // 07:57:02,SYTA,S,6.84,299
+
+// Short Sell trades
+short_trade_1 = is_trade_time(7, 19, 37) ? 6.29 : na    // 07:19:37,SYTA,SS,6.29,1
+short_trade_2 = is_trade_time(7, 19, 37) ? 6.31 : na    // 07:19:37,SYTA,SS,6.31,1
+short_trade_3 = is_trade_time(7, 19, 37) ? 6.33 : na    // 07:19:37,SYTA,SS,6.33,1
+short_trade_4 = is_trade_time(7, 19, 37) ? 6.35 : na    // 07:19:37,SYTA,SS,6.35,1
+short_trade_5 = is_trade_time(7, 19, 37) ? 6.37 : na    // 07:19:37,SYTA,SS,6.37,200
+short_trade_6 = is_trade_time(7, 19, 37) ? 6.39 : na    // 07:19:37,SYTA,SS,6.39,96
+
+// Plot Buy trades
+plotshape(show_buy_trades ? buy_trade_1 : na, style=shape.triangleup, location=location.absolute, color=buy_color, size=size.small, title="Buy 6.04")
+plotshape(show_buy_trades ? buy_trade_2 : na, style=shape.triangleup, location=location.absolute, color=buy_color, size=size.small, title="Buy 5.96")
+plotshape(show_buy_trades ? buy_trade_3 : na, style=shape.triangleup, location=location.absolute, color=buy_color, size=size.small, title="Buy 5.96")
+plotshape(show_buy_trades ? buy_trade_4 : na, style=shape.triangleup, location=location.absolute, color=buy_color, size=size.small, title="Buy 6.85")
+plotshape(show_buy_trades ? buy_trade_5 : na, style=shape.triangleup, location=location.absolute, color=buy_color, size=size.small, title="Buy 6.83")
+plotshape(show_buy_trades ? buy_trade_6 : na, style=shape.triangleup, location=location.absolute, color=buy_color, size=size.small, title="Buy 6.66")
+plotshape(show_buy_trades ? buy_trade_7 : na, style=shape.triangleup, location=location.absolute, color=buy_color, size=size.small, title="Buy 6.66")
+plotshape(show_buy_trades ? buy_trade_8 : na, style=shape.triangleup, location=location.absolute, color=buy_color, size=size.small, title="Buy 6.58")
+plotshape(show_buy_trades ? buy_trade_9 : na, style=shape.triangleup, location=location.absolute, color=buy_color, size=size.small, title="Buy 6.74")
+plotshape(show_buy_trades ? buy_trade_10 : na, style=shape.triangleup, location=location.absolute, color=buy_color, size=size.small, title="Buy 6.87")
+plotshape(show_buy_trades ? buy_trade_11 : na, style=shape.triangleup, location=location.absolute, color=buy_color, size=size.small, title="Buy 6.87")
+plotshape(show_buy_trades ? buy_trade_12 : na, style=shape.triangleup, location=location.absolute, color=buy_color, size=size.small, title="Buy 6.82")
+
+// Plot Sell trades
+plotshape(show_sell_trades ? sell_trade_1 : na, style=shape.triangledown, location=location.absolute, color=sell_color, size=size.small, title="Sell 6.99")
+plotshape(show_sell_trades ? sell_trade_2 : na, style=shape.triangledown, location=location.absolute, color=sell_color, size=size.small, title="Sell 6.99")
+plotshape(show_sell_trades ? sell_trade_3 : na, style=shape.triangledown, location=location.absolute, color=sell_color, size=size.small, title="Sell 6.99")
+plotshape(show_sell_trades ? sell_trade_4 : na, style=shape.triangledown, location=location.absolute, color=sell_color, size=size.small, title="Sell 7.23")
+plotshape(show_sell_trades ? sell_trade_5 : na, style=shape.triangledown, location=location.absolute, color=sell_color, size=size.small, title="Sell 7.26")
+plotshape(show_sell_trades ? sell_trade_6 : na, style=shape.triangledown, location=location.absolute, color=sell_color, size=size.small, title="Sell 6.85")
+plotshape(show_sell_trades ? sell_trade_7 : na, style=shape.triangledown, location=location.absolute, color=sell_color, size=size.small, title="Sell 6.81")
+plotshape(show_sell_trades ? sell_trade_8 : na, style=shape.triangledown, location=location.absolute, color=sell_color, size=size.small, title="Sell 6.84")
+
+// Plot Short Sell trades
+plotshape(show_short_trades ? short_trade_1 : na, style=shape.diamond, location=location.absolute, color=short_color, size=size.small, title="Short 6.29")
+plotshape(show_short_trades ? short_trade_2 : na, style=shape.diamond, location=location.absolute, color=short_color, size=size.small, title="Short 6.31")
+plotshape(show_short_trades ? short_trade_3 : na, style=shape.diamond, location=location.absolute, color=short_color, size=size.small, title="Short 6.33")
+plotshape(show_short_trades ? short_trade_4 : na, style=shape.diamond, location=location.absolute, color=short_color, size=size.small, title="Short 6.35")
+plotshape(show_short_trades ? short_trade_5 : na, style=shape.diamond, location=location.absolute, color=short_color, size=size.small, title="Short 6.37")
+plotshape(show_short_trades ? short_trade_6 : na, style=shape.diamond, location=location.absolute, color=short_color, size=size.small, title="Short 6.39")
+
+// Add labels for trade details
+if show_labels
+    // Buy trade labels
+    if show_buy_trades and is_trade_time(7, 20, 6)
+        label.new(bar_index, 6.04, "B @ 6.04\nQty: 100\n07:20:06", style=label.style_label_left, color=buy_color, textcolor=color.white, size=size.small)
+    if show_buy_trades and is_trade_time(7, 21, 39)
+        label.new(bar_index, 5.96, "B @ 5.96\nQty: 30\n07:21:39", style=label.style_label_left, color=buy_color, textcolor=color.white, size=size.small)
+    if show_buy_trades and is_trade_time(7, 21, 40)
+        label.new(bar_index, 5.96, "B @ 5.96\nQty: 170\n07:21:40", style=label.style_label_left, color=buy_color, textcolor=color.white, size=size.small)
+    if show_buy_trades and is_trade_time(7, 27, 46)
+        label.new(bar_index, 6.85, "B @ 6.85\nQty: 500\n07:27:46", style=label.style_label_left, color=buy_color, textcolor=color.white, size=size.small)
+    if show_buy_trades and is_trade_time(7, 27, 51)
+        label.new(bar_index, 6.83, "B @ 6.83\nQty: 500\n07:27:51", style=label.style_label_left, color=buy_color, textcolor=color.white, size=size.small)
+    if show_buy_trades and is_trade_time(7, 34, 0)
+        label.new(bar_index, 6.66, "B @ 6.66\nQty: 63\n07:34:00", style=label.style_label_left, color=buy_color, textcolor=color.white, size=size.small)
+    if show_buy_trades and is_trade_time(7, 34, 1)
+        label.new(bar_index, 6.66, "B @ 6.66\nQty: 237\n07:34:01", style=label.style_label_left, color=buy_color, textcolor=color.white, size=size.small)
+    if show_buy_trades and is_trade_time(7, 34, 11)
+        label.new(bar_index, 6.58, "B @ 6.58\nQty: 300\n07:34:11", style=label.style_label_left, color=buy_color, textcolor=color.white, size=size.small)
+    if show_buy_trades and is_trade_time(7, 39, 20)
+        label.new(bar_index, 6.74, "B @ 6.74\nQty: 100\n07:39:20", style=label.style_label_left, color=buy_color, textcolor=color.white, size=size.small)
+    if show_buy_trades and is_trade_time(7, 39, 34)
+        label.new(bar_index, 6.87, "B @ 6.87\nQty: 300\n07:39:34", style=label.style_label_left, color=buy_color, textcolor=color.white, size=size.small)
+    if show_buy_trades and is_trade_time(7, 55, 23)
+        label.new(bar_index, 6.87, "B @ 6.87\nQty: 200\n07:55:23", style=label.style_label_left, color=buy_color, textcolor=color.white, size=size.small)
+    if show_buy_trades and is_trade_time(7, 56, 14)
+        label.new(bar_index, 6.82, "B @ 6.82\nQty: 100\n07:56:14", style=label.style_label_left, color=buy_color, textcolor=color.white, size=size.small)
+    
+    // Sell trade labels
+    if show_sell_trades and is_trade_time(7, 27, 57)
+        label.new(bar_index, 6.99, "S @ 6.99\nQty: 745\n07:27:57", style=label.style_label_left, color=sell_color, textcolor=color.white, size=size.small)
+    if show_sell_trades and is_trade_time(7, 28, 2)
+        label.new(bar_index, 6.99, "S @ 6.99\nQty: 255\n07:28:02", style=label.style_label_left, color=sell_color, textcolor=color.white, size=size.small)
+    if show_sell_trades and is_trade_time(7, 39, 58)
+        label.new(bar_index, 6.99, "S @ 6.99\nQty: 300\n07:39:58", style=label.style_label_left, color=sell_color, textcolor=color.white, size=size.small)
+    if show_sell_trades and is_trade_time(7, 40, 36)
+        label.new(bar_index, 7.23, "S @ 7.23\nQty: 200\n07:40:36", style=label.style_label_left, color=sell_color, textcolor=color.white, size=size.small)
+    if show_sell_trades and is_trade_time(7, 43, 22)
+        label.new(bar_index, 7.26, "S @ 7.26\nQty: 300\n07:43:22", style=label.style_label_left, color=sell_color, textcolor=color.white, size=size.small)
+    if show_sell_trades and is_trade_time(7, 44, 3)
+        label.new(bar_index, 6.85, "S @ 6.85\nQty: 200\n07:44:03", style=label.style_label_left, color=sell_color, textcolor=color.white, size=size.small)
+    if show_sell_trades and is_trade_time(7, 57, 2)
+        label.new(bar_index, 6.81, "S @ 6.81\nQty: 1\n07:57:02", style=label.style_label_left, color=sell_color, textcolor=color.white, size=size.small)
+    if show_sell_trades and is_trade_time(7, 57, 2)
+        label.new(bar_index, 6.84, "S @ 6.84\nQty: 299\n07:57:02", style=label.style_label_left, color=sell_color, textcolor=color.white, size=size.small)
+    
+    // Short trade labels
+    if show_short_trades and is_trade_time(7, 19, 37)
+        label.new(bar_index, 6.29, "SS @ 6.29\nQty: 1\n07:19:37", style=label.style_label_left, color=short_color, textcolor=color.white, size=size.small)
+    if show_short_trades and is_trade_time(7, 19, 37)
+        label.new(bar_index, 6.31, "SS @ 6.31\nQty: 1\n07:19:37", style=label.style_label_left, color=short_color, textcolor=color.white, size=size.small)
+    if show_short_trades and is_trade_time(7, 19, 37)
+        label.new(bar_index, 6.33, "SS @ 6.33\nQty: 1\n07:19:37", style=label.style_label_left, color=short_color, textcolor=color.white, size=size.small)
+    if show_short_trades and is_trade_time(7, 19, 37)
+        label.new(bar_index, 6.35, "SS @ 6.35\nQty: 1\n07:19:37", style=label.style_label_left, color=short_color, textcolor=color.white, size=size.small)
+    if show_short_trades and is_trade_time(7, 19, 37)
+        label.new(bar_index, 6.37, "SS @ 6.37\nQty: 200\n07:19:37", style=label.style_label_left, color=short_color, textcolor=color.white, size=size.small)
+    if show_short_trades and is_trade_time(7, 19, 37)
+        label.new(bar_index, 6.39, "SS @ 6.39\nQty: 96\n07:19:37", style=label.style_label_left, color=short_color, textcolor=color.white, size=size.small)
+
+// Summary table or warning message
+if barstate.islast
+    if is_syta_symbol
+        // Show trade summary for SYTA
+        var table summary_table = table.new(position.top_right, 2, 5, bgcolor=color.white, border_width=1)
+        
+        table.cell(summary_table, 0, 0, "SYTA Trades", text_color=color.black, text_size=size.normal)
+        table.cell(summary_table, 1, 0, "Count", text_color=color.black, text_size=size.normal)
+        table.cell(summary_table, 0, 1, "Buy", text_color=color.green, text_size=size.small)
+        table.cell(summary_table, 1, 1, "12", text_color=color.black, text_size=size.small)
+        table.cell(summary_table, 0, 2, "Sell", text_color=color.red, text_size=size.small)
+        table.cell(summary_table, 1, 2, "8", text_color=color.black, text_size=size.small)
+        table.cell(summary_table, 0, 3, "Short", text_color=color.orange, text_size=size.small)
+        table.cell(summary_table, 1, 3, "6", text_color=color.black, text_size=size.small)
+        table.cell(summary_table, 0, 4, "Total", text_color=color.black, text_size=size.small)
+        table.cell(summary_table, 1, 4, "26", text_color=color.black, text_size=size.small)
+    else
+        // Show warning for wrong symbol
+        var table warning_table = table.new(position.top_right, 1, 3, bgcolor=color.new(color.red, 80), border_width=2)
+        
+        table.cell(warning_table, 0, 0, "⚠️ WARNING ⚠️", text_color=color.white, text_size=size.normal)
+        table.cell(warning_table, 0, 1, "This indicator is designed", text_color=color.white, text_size=size.small)
+        table.cell(warning_table, 0, 2, "for SYTA symbol only!", text_color=color.white, text_size=size.small)
+
+// Plot horizontal lines for key price levels
+hline(6.61, "Key Level $6.61", color=color.gray, linestyle=hline.style_dashed)
+hline(5.96, "Key Level $5.96", color=color.gray, linestyle=hline.style_dashed)
+hline(7.26, "Key Level $7.26", color=color.gray, linestyle=hline.style_dashed)
+
+// Add alert conditions for trades
+alertcondition(buy_trade_1 or buy_trade_2 or buy_trade_3 or buy_trade_4 or buy_trade_5 or buy_trade_6 or buy_trade_7 or buy_trade_8 or buy_trade_9 or buy_trade_10 or buy_trade_11 or buy_trade_12, title="SYTA Buy Trade", message="SYTA Buy trade detected")
+alertcondition(sell_trade_1 or sell_trade_2 or sell_trade_3 or sell_trade_4 or sell_trade_5 or sell_trade_6 or sell_trade_7 or sell_trade_8, title="SYTA Sell Trade", message="SYTA Sell trade detected")
+alertcondition(short_trade_1 or short_trade_2 or short_trade_3 or short_trade_4 or short_trade_5 or short_trade_6, title="SYTA Short Trade", message="SYTA Short trade detected")
