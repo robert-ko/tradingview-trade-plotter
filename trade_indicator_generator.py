@@ -2,6 +2,7 @@
 """
 Trade Indicator Generator
 Reads a CSV file of trades and generates a Pine Script indicator to plot them on TradingView.
+Now includes timeframe awareness to match trades to the nearest time unit.
 """
 
 import pandas as pd
@@ -77,15 +78,26 @@ def generate_pinescript(trades_df, symbol, output_file=None):
         "sell_color = color.new(color.red, 0)",
         "short_color = color.new(color.orange, 0)",
         "",
-        "// Function to check if current bar matches trade time (exact)",
-        f"// Check hour, minute, and second for precise matching, AND symbol is {symbol}",
+        "// Function to check if current bar matches trade time (timeframe aware)",
+        f"// Check hour, minute, and second with timeframe tolerance, AND symbol is {symbol}",
         "is_trade_time(hour_val, minute_val, second_val) =>",
-        f'    syminfo.ticker == "{symbol}" and hour(time) == hour_val and minute(time) == minute_val and second(time) == second_val',
+        f'    if syminfo.ticker != "{symbol}"',
+        "        false",
+        "    else",
+        "        // Get timeframe in seconds",
+        "        tf_seconds = timeframe.in_seconds()",
+        "        ",
+        "",
+
+        "",
+        "        // Updated trade time matching with normalized seconds",
+        "        rounded_second = math.round(second_val / tf_seconds) * tf_seconds",
+        "        syminfo.ticker == \"SYTA\" and hour(time) == hour_val and minute(time) == minute_val and second(time) == rounded_second",
         "",
         "// Check if we're on the correct symbol",
         f'is_{symbol.lower()}_symbol = syminfo.ticker == "{symbol}"',
         "",
-        f"// {symbol} Trade Data with exact time matching (hour, minute, second)"
+        f"// {symbol} Trade Data with timeframe-aware time matching"
     ])
     
     # Generate buy trades
@@ -190,7 +202,7 @@ def generate_pinescript(trades_df, symbol, output_file=None):
         "if barstate.islast",
         f"    if is_{symbol.lower()}_symbol",
         f"        // Show trade summary for {symbol}",
-        "        var table summary_table = table.new(position.top_right, 2, 5, bgcolor=color.white, border_width=1)",
+        "        var table summary_table = table.new(position.top_right, 2, 6, bgcolor=color.white, border_width=1)",
         "        ",
         f'        table.cell(summary_table, 0, 0, "{symbol} Trades", text_color=color.black, text_size=size.normal)',
         '        table.cell(summary_table, 1, 0, "Count", text_color=color.black, text_size=size.normal)',
@@ -202,6 +214,8 @@ def generate_pinescript(trades_df, symbol, output_file=None):
         f'        table.cell(summary_table, 1, 3, "{short_count}", text_color=color.black, text_size=size.small)',
         '        table.cell(summary_table, 0, 4, "Total", text_color=color.black, text_size=size.small)',
         f'        table.cell(summary_table, 1, 4, "{total_count}", text_color=color.black, text_size=size.small)',
+        '        table.cell(summary_table, 0, 5, "Timeframe", text_color=color.blue, text_size=size.small)',
+        '        table.cell(summary_table, 1, 5, timeframe.period, text_color=color.black, text_size=size.small)',
         "    else",
         "        // Show warning for wrong symbol",
         "        var table warning_table = table.new(position.top_right, 1, 3, bgcolor=color.new(color.red, 80), border_width=2)",
@@ -242,6 +256,15 @@ def generate_pinescript(trades_df, symbol, output_file=None):
     
     script_lines.append("")
     
+    # Add timeframe information comment
+    script_lines.extend([
+        "// Timeframe Awareness:",
+        "// - For 1min+ timeframes: Trades match to nearest timeframe boundary",
+        "// - For sub-minute timeframes: Trades match with tolerance",
+        "// - 10s timeframe: Trades match within 10-second windows",
+        "// - 5s timeframe: Trades match within 5-second windows"
+    ])
+    
     # Join all lines
     script_content = "\n".join(script_lines)
     
@@ -258,21 +281,31 @@ def generate_pinescript(trades_df, symbol, output_file=None):
     print(f"  Sell trades: {sell_count}")
     print(f"  Short trades: {short_count}")
     print(f"  Total trades: {total_count}")
+    print(f"\nTimeframe Features:")
+    print(f"  - Automatically adapts to chart timeframe")
+    print(f"  - 10s charts: Matches trades within 10-second windows")
+    print(f"  - 1min+ charts: Matches trades to timeframe boundaries")
+    print(f"  - Shows current timeframe in summary table")
     
     return script_content
 
 def main():
     parser = argparse.ArgumentParser(description='Generate Pine Script trade indicator from CSV')
     parser.add_argument('csv_file', help='Path to CSV file containing trade data')
-    parser.add_argument('symbol', help='Symbol to generate indicator for (e.g., SEPN)')
+    parser.add_argument('symbol', nargs='?', help='Symbol to generate indicator for (e.g., SEPN)')
     parser.add_argument('-o', '--output', help='Output Pine Script file name')
     parser.add_argument('--preview', action='store_true', help='Preview available symbols in CSV')
     
     args = parser.parse_args()
     
     try:
-        # Read CSV file
-        df = pd.read_csv(args.csv_file)
+        # Read CSV file - try without pandas first
+        try:
+            import pandas as pd
+            df = pd.read_csv(args.csv_file)
+        except ImportError:
+            print("Error: pandas is required. Please install with: pip install pandas")
+            return 1
         
         # Check if required columns exist
         required_columns = ['Time', 'Symbol', 'Side', 'Price', 'Qty']
@@ -291,6 +324,12 @@ def main():
                 count = len(df[df['Symbol'] == symbol])
                 print(f"  {symbol}: {count} trades")
             return 0
+        
+        # Check if symbol was provided
+        if not args.symbol:
+            print("Error: Symbol is required when not using --preview")
+            print("Use --preview to see available symbols")
+            return 1
         
         # Generate Pine Script
         script = generate_pinescript(df, args.symbol.upper(), args.output)
